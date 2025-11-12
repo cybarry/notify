@@ -1,0 +1,14 @@
+# Node.js
+/node_modules
+/npm-debug.log
+
+# Docker
+/docker-compose.yml.local
+
+# Mac
+.DS_Store
+
+# Volumes from docker-compose
+/rabbitmq_data
+/user_db_data
+/redis_data

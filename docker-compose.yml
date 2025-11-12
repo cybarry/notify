@@ -1,0 +1,61 @@
+services:
+  #  RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP port for services
+      - "15672:15672" # Management UI (visit on http://localhost:15672)
+    environment:
+      - RABBITMQ_DEFAULT_USER=cybarry
+      - RABBITMQ_DEFAULT_PASS=cybarry
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped # Restart the container unless manually stopped
+
+  # PostgreSQL DB for User Service
+  user_db:
+    image: postgres:14-alpine
+    container_name: user_db
+    ports:
+      - "5432:5432" # Expose Postgres for local debugging
+    environment:
+      - POSTGRES_USER=cybarry
+      - POSTGRES_PASSWORD=cybarry
+      - POSTGRES_DB=user_service_db
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+
+  # Redis for Caching
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # User Service Me
+  user_service:
+    build: ./services/user-service # Path to its Dockerfile
+    container_name: user_service
+    ports:
+      - "3001:3001" # HostPort:ContainerPort
+    depends_on:
+      - user_db
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://user:password@user_db:5432/user_service_db
+      - REDIS_URL=redis://redis:6379
+
+
+# Define the persistent volumes
+volumes:
+  rabbitmq_data:
+  user_db_data:
+  redis_data:
