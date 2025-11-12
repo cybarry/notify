@@ -1,9 +1,15 @@
 # Node.js
+/services/api-gateway/node_modules
+/services/user-service/node_modules
+/services/email-service/node_modules
+/services/push-service/node_modules
+/services/template-service/node_modules
 /node_modules
 /npm-debug.log
 
 # Docker
 /docker-compose.yml.local
+/docker-compose.copy.yml
 
 # Mac
 .DS_Store
